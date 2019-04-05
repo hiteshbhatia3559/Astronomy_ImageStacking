@@ -7,6 +7,7 @@ from statistics import mean
 
 
 def get_data(path_to_files):  # Get data from each file in dir
+    print("Getting data...\n")
     filenames = os.listdir(path_to_files)
     dataset = dict()
     for file in filenames:
@@ -34,11 +35,13 @@ def get_data(path_to_files):  # Get data from each file in dir
             width_x = len(indices_x)
             width_y = len(indices_y)
             QF = mean_value / ((width_x + width_y) / 2)
+            print("Quality Factor of {} is {}\n".format(QF, file))
             dataset[file] = (file, QF)
         except:
-            print("Skipped " + file + " because it did not open!")
+            print("Skipped " + file + " because it did not open or data was corrupted!")
 
     return dataset
+
 
 if __name__ == '__main__':
 
@@ -47,24 +50,28 @@ if __name__ == '__main__':
 
     dataset = get_data(path_to_files)
 
-    sorted_list = sorted(list(dataset.values()),key=lambda x: x[1])
+    print("All QFs calculated\n")
 
-    files_to_merge = sorted_list[int(len(sorted_list)*(4/5)):]
+    sorted_list = sorted(list(dataset.values()), key=lambda x: x[1])
+
+    files_to_merge = sorted_list[int(len(sorted_list) * (4 / 5)):]
+
+    print("Top 20% images picked\nMerging now...\n")
 
     filenames = []
 
     for item in files_to_merge:
-        x,y = item
+        x, y = item
         filenames.append(x)
 
     image_concat = []
     for image in filenames:
-        image_concat.append(fits.getdata(path_to_files+image))
+        image_concat.append(fits.getdata(path_to_files + image))
 
     final_image = np.zeros(shape=image_concat[0].shape)
 
     for image in image_concat:
-        final_image+=image
+        final_image += image
 
     # ONLY USABLE IN JUPYTER/PYCHARM
     # SEE WHAT THE MERGED IMAGE LOOKS LIKE
@@ -72,7 +79,9 @@ if __name__ == '__main__':
     # plt.imshow(final_image, cmap='gray', vmin=2.e3, vmax=3.e3)
     # plt.colorbar()
     # plt.show()
+
     outfile = "stacked.fit"
     hdu = fits.PrimaryHDU(final_image)
-    hdu.writeto(outfile,overwrite=True)
+    hdu.writeto(outfile, overwrite=True)
+    print("Please see {} for output".format(outfile))
     # Prints final file
