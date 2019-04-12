@@ -9,7 +9,7 @@ from astropy.nddata import Cutout2D
 def max_value(array):
     maximums = []
     for item in array:
-        if (max(item) < 20000):
+        if (max(item) < 20000) and (max(item > 100)):
             maximums.append(max(item))
     return maximums
 
@@ -17,7 +17,7 @@ filenames = ['Autosave Image -0019.fit', 'Autosave Image -0051.fit', 'Autosave I
 path = 'Iota Cancri - Binary System-20190405T043457Z-001/Iota Cancri - Binary System/'
 for file in filenames:
     data = fits.getdata(path+file)
-    plt.plot(max_value(data)[110:300])
+    plt.plot(max_value(data)[100:300])
 
 plt.show()
 
