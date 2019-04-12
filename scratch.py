@@ -30,7 +30,7 @@ for seq in ran:
     new.append(new_seq)
 
 for item in new:
-    plt.plot(item)
+    plt.plot(item[80:190])
 
 plt.show()
 
