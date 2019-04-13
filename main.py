@@ -54,6 +54,8 @@ def max_value(array):
 
 def find_best_fit(image_concat,max_values):
     print("Finding best fit for alignment, this is a long process, please wait!\n")
+    print("A "+str(len(image_concat)))
+    print("B " + str(len(max_values)))
     final_image = np.zeros(shape=image_concat[0].shape)
     x = list(range(-4, 4))
     x.remove(0)
@@ -65,16 +67,14 @@ def find_best_fit(image_concat,max_values):
             i = 0
             for image in image_concat:
                 delta = max_values[0].index(max(max_values[0])) - max_values[i].index(max(max_values[i]))
-                # print(image)
-                if delta == 0:
-                    break
                 # print(delta)
                 new_image = np.roll(image, [int(delta / a), int(delta / b)], axis=(0, 1))
+                print(new_image)
                 final_image += new_image
                 i += 1
             list_of_finals[max(max_value(final_image))] = final_image
 
-    print(len(list(list_of_finals.keys())))
+    print(list_of_finals.keys())
     peak_image_brightness = max(list(list_of_finals.keys()))
     # print(peak_image_brightness)
     fitted_final_image = list_of_finals[peak_image_brightness]
@@ -109,7 +109,7 @@ if __name__ == '__main__':
         image_data = fits.getdata(path_to_files + image)
         image_concat.append(image_data)
         max_values.append(max_value(image_data))
-    print(len(max_values))
+
     # Making a template array that is blank
 
     final_image = find_best_fit(image_concat,max_values)
