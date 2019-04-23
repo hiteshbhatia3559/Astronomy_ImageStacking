@@ -5,6 +5,8 @@ from PIL import ImageChops
 import os
 from statistics import mean
 from astropy.nddata import Cutout2D
+from image_registration import chi2_shift
+from image_registration.fft_tools import shift
 
 def max_value(array):
     maximums = []
@@ -18,19 +20,16 @@ path = 'Iota Cancri - Binary System-20190405T043457Z-001/Iota Cancri - Binary Sy
 
 ran = []
 
-for file in filenames[:4]:
+for file in filenames:
     data = fits.getdata(path+file)
-    ran.append(max_value(data))
+    ran.append(data)
 
-new = []
+xoff, yoff, exoff, eyoff = chi2_shift(ran[0], ran[1], return_error=True, upsample_factor='auto')
 
-for seq in ran:
-    delta = ran[0].index(max(ran[0])) - seq.index(max(seq))
-    new_seq = np.roll(seq,delta)
-    new.append(new_seq)
+corrected = shift.shift2d(ran[1], -yoff,-xoff)
 
-for item in new:
-    plt.plot(item[80:190])
+plt.plot(corrected[150:210])
 
 plt.show()
+
 
