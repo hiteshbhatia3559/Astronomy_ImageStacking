@@ -11,7 +11,7 @@ from find import find
 import matplotlib.pyplot as plt
 
 # load FITS image and specify PSF star coordinates
-data = fits.getdata('stacked1.fit')
+data = fits.getdata('stacked.fit')
 
 window = int(input("Size of object in pixel?\n"))
 
