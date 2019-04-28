@@ -11,8 +11,10 @@ from find import find
 import matplotlib.pyplot as plt
 
 # load FITS image and specify PSF star coordinates
-image = fits.getdata('stacked.fit')
-
+data = fits.getdata('stacked.fit')
+i,j = np.unravel_index(data.argmax(), data.shape)
+image = Cutout2D(data, (j, i), size = 200).data
+# plt.imshow(cutout1.data, cmap='gray', vmin=2.e3, vmax=3.e3)
 # print(image)
 
 amp = np.max(image)
@@ -39,14 +41,18 @@ xpos,ypos = x,y
 # run aper to get mags and sky values for specified coords
 mag, magerr, flux, fluxerr, sky, skyerr, badflag, outstr = \
     aper.aper(image, xpos, ypos, phpadu=1, apr=5, zeropoint=25,
-              skyrad=[40, 50], badpix=[-12000, 60000], exact=True)
+              skyrad=[40, 50], badpix=[-12000, 600000], exact=True)
 # use the stars at those coords to generate a PSF model
 gauss, psf, psfmag = \
     getpsf.getpsf(image, xpos, ypos,
                   mag, sky, 1, 1, np.arange(len(xpos)),
-                  fitrad=100, psfname='output_psf.fits',psfrad=110)
+                  fitrad=60, psfname='output_psf.fits',psfrad=70)
 
-data = fits.open('output_psf.fits')[0].data
-plt.imshow(data, cmap='gray', vmin=2.e3, vmax=3.e3)
-plt.colorbar()
-plt.show()
+print(psfmag)
+
+# plt.plot(gauss)
+# plt.show()
+# data = fits.open('output_psf.fits')[0].data
+# plt.imshow(data, cmap='gray', vmin=2.e3, vmax=3.e3)
+# plt.colorbar()
+# plt.show()
