@@ -1,46 +1,22 @@
-import warnings
-import numpy as np
-# import matplotlib.pyplot as plt
-from astropy.modeling import models, fitting
+#!/usr/bin/env python
+# D. Jones - 1/14/14
+"""This code is from the IDL Astronomy Users Library"""
+
 from astropy.io import fits
-# import photutils
-from astropy.visualization import simple_norm
-import matplotlib.pyplot as plt
+from astropy.nddata import Cutout2D
+import numpy as np
+import getpsf
+import aper
 
-
-# Generate fake data
-
-data = fits.open('stacked.fit')[0].data
-norm = simple_norm(data, 'sqrt', percent=99.)
-
-y,x = data
-
-#
-# np.random.seed(0)
-# y, x = np.mgrid[:128, :128]
-z = 2. * x ** 2 - 0.5 * x ** 2 + 1.5 * x * y - 1.
-z += np.random.normal(0., 0.1, z.shape) * 50000.
-
-# Fit the data using astropy.modeling
-p_init = models.Polynomial2D(degree=2)
-fit_p = fitting.LevMarLSQFitter()
-
-with warnings.catch_warnings():
-    # Ignore model linearity warning from the fitter
-    warnings.simplefilter('ignore')
-    p = fit_p(p_init, x, y, z)
-
-# Plot the data with the best-fit model
-plt.figure(figsize=(8, 2.5))
-plt.subplot(1, 3, 1)
-plt.imshow(z, origin='lower', interpolation='nearest', vmin=-1e4, vmax=5e4)
-plt.title("Data")
-plt.subplot(1, 3, 2)
-plt.imshow(p(x, y), origin='lower', interpolation='nearest', vmin=-1e4,
-           vmax=5e4)
-plt.title("Model")
-plt.subplot(1, 3, 3)
-plt.imshow(z - p(x, y), origin='lower', interpolation='nearest', vmin=-1e4,
-           vmax=5e4)
-plt.title("Residual")
-plt.show()
+# load FITS image and specify PSF star coordinates
+image = fits.getdata('stacked.fit')
+xpos, ypos = np.array([1450, 1400]), np.array([1550, 1600])
+# run aper to get mags and sky values for specified coords
+mag, magerr, flux, fluxerr, sky, skyerr, badflag, outstr = \
+    aper.aper(image, xpos, ypos, phpadu=1, apr=5, zeropoint=25,
+              skyrad=[40, 50], badpix=[-12000, 60000], exact=True)
+# use the stars at those coords to generate a PSF model
+gauss, psf, psfmag = \
+    getpsf.getpsf(image, xpos, ypos,
+                  mag, sky, 1, 1, np.arange(len(xpos)),
+                  5, 'output_psf.fits')
