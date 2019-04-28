@@ -39,12 +39,18 @@ xpos,ypos = x,y
 # run aper to get mags and sky values for specified coords
 mag, magerr, flux, fluxerr, sky, skyerr, badflag, outstr = \
     aper.aper(image, xpos, ypos, phpadu=1, apr=5, zeropoint=25,
-              skyrad=[40, 50], badpix=[0, 70000], exact=True)
+              skyrad=[40, 50], badpix=[0, 70000], exact=True,verbose=False)
 # use the stars at those coords to generate a PSF model
 gauss, psf, psfmag = \
     getpsf.getpsf(image, xpos, ypos,
                   mag, sky, 1, 1, np.arange(len(xpos)),
-                  fitrad=60, psfname='output_psf.fits',psfrad=70)
+                  fitrad=60, psfname='output_psf.fits',psfrad=70,verbose=False)
+
+print("Amplitude of Gauss Function : "+str(gauss[0]))
+print("X-Axis Best Fit Offset : "+str(gauss[1]))
+print("Y-Axis Best Fit Offset : "+str(gauss[2]))
+print("Standard deviation of the gauss function on the X-axis : "+str(gauss[3]))
+print("Standard deviation of the gauss function on the Y-axis : "+str(gauss[4]))
 
 # plt.plot(gauss)
 # plt.show()
