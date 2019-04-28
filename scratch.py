@@ -1,6 +1,4 @@
 from astropy.io import fits
-# import photutils
-from astropy.visualization import simple_norm
 import matplotlib.pyplot as plt
 
 data = fits.open('output_psf.fits')[0].data
